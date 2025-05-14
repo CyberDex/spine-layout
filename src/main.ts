@@ -1,6 +1,8 @@
 import '@esotericsoftware/spine-pixi-v8';
 import { Application } from "pixi.js";
 import { DevTools, SpineLayout } from "./utils";
+import { SpineLayoutEditor } from './utils/SpineLayoutEditor';
+import type { ButtonApi } from 'tweakpane';
 
 new class App {
     layout?: SpineLayout;
@@ -72,6 +74,26 @@ new class App {
 
                 console.log(`end: ${animation}`);
             });
+        });
+
+
+        const layoutEditor = new SpineLayoutEditor(this.layout!);
+
+        await layoutEditor.init();
+
+        devTools.addFolder({
+            title: 'Editor',
+            expanded: true,
+        }).addButton({
+            title: layoutEditor.initialised ? 'Close layout' : 'Open layout',
+        }).on('click', async ({ target }: { target: ButtonApi }) => {
+            if (layoutEditor.initialised) {
+                await layoutEditor.close();
+            } else {
+                await layoutEditor.init();
+            }
+
+            target.title = layoutEditor.initialised ? 'Close layout' : 'Open layout';
         });
     }
 };
