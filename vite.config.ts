@@ -1,14 +1,12 @@
 import eslintPlugin from '@nabla/vite-plugin-eslint';
 import ConditionalCompile from 'vite-plugin-conditional-compiler';
 import { loadEnv, defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const isProd = mode === 'production';
 
     const plugins = [
-        react(),
         ConditionalCompile(),
         eslintPlugin(),
     ];
