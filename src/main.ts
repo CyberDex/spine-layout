@@ -2,11 +2,14 @@ import '@esotericsoftware/spine-pixi-v8';
 import { Application } from "pixi.js";
 import { DevTools, SpineLayout } from "./utils";
 import { SpineLayoutEditor } from './utils/SpineLayoutEditor';
-import type { ButtonApi } from 'tweakpane';
 
-new class App {
-    layout?: SpineLayout;
+export const pixi = new Application();
+
+export default new class App {
     pixi = new Application();
+    layout?: SpineLayout;
+    layoutEditor?: SpineLayoutEditor;
+    devTools?: DevTools;
     version = `${APP_VERSION} (${APP_MODE})`;
 
     constructor() {
@@ -14,13 +17,17 @@ new class App {
     }
 
     async init() {
-        this.layout = new SpineLayout({
-            debug: true,
-        });
+        this.layout = new SpineLayout({ debug: true });
 
         await this.initApp(this.layout);
 
-        this.addCheats();
+        this.devTools = new DevTools({
+            app: this.pixi,
+            gameName: APP_NAME,
+            gameVersion: this.version,
+        });
+
+        this.layoutEditor = new SpineLayoutEditor(this.layout, this.devTools);
     }
 
     private async initApp(layout: SpineLayout) {
@@ -52,48 +59,5 @@ new class App {
                 );
             }
         }
-    }
-
-    private async addCheats() {
-        const devTools = new DevTools({
-            app: this.pixi,
-            gameName: APP_NAME,
-            gameVersion: this.version,
-        })
-
-        const cheats = devTools.addFolder({
-            title: 'Available Animations',
-            expanded: true,
-        });
-
-        this.layout?.getAnimations().forEach((animation) => {
-            cheats.addButton({ title: animation }).on('click', async () => {
-                console.log(`start: ${animation}`);
-
-                await this.layout?.play(animation);
-
-                console.log(`end: ${animation}`);
-            });
-        });
-
-
-        const layoutEditor = new SpineLayoutEditor(this.layout!);
-
-        await layoutEditor.init();
-
-        devTools.addFolder({
-            title: 'Editor',
-            expanded: true,
-        }).addButton({
-            title: layoutEditor.initialised ? 'Close layout' : 'Open layout',
-        }).on('click', async ({ target }: { target: ButtonApi }) => {
-            if (layoutEditor.initialised) {
-                await layoutEditor.close();
-            } else {
-                await layoutEditor.init();
-            }
-
-            target.title = layoutEditor.initialised ? 'Close layout' : 'Open layout';
-        });
     }
 };

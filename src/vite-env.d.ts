@@ -8,5 +8,4 @@ declare const APP_MODE: string;
 interface Window {
     __PIXI_APP__: Application;
     showDirectoryPicker: (params: { mode: 'reed' | 'write' | 'readwrite' }) => Promise<FileSystemDirectoryHandle>;
-    showOpenFilePicker: (params: {}) => Promise<FileData>;
 }
